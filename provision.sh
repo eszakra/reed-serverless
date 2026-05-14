@@ -5,7 +5,16 @@
 # and cached on the worker's disk for subsequent requests.
 # =============================================================================
 
-COMFY="/opt/ComfyUI"
+# Auto-detect ComfyUI path
+if [ -d "/workspace/ComfyUI" ]; then
+    COMFY="/workspace/ComfyUI"
+elif [ -d "/opt/ComfyUI" ]; then
+    COMFY="/opt/ComfyUI"
+else
+    COMFY=$(find / -maxdepth 3 -name "main.py" -path "*/ComfyUI/*" 2>/dev/null | head -1 | xargs dirname)
+    [ -z "$COMFY" ] && echo "ERROR: ComfyUI not found" && exit 1
+fi
+echo "ComfyUI path: $COMFY"
 MODELS="$COMFY/models"
 NODES="$COMFY/custom_nodes"
 _R="https://huggingface.co/zakraaa/reed-workflow-models/resolve/main"
